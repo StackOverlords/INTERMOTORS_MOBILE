@@ -30,6 +30,7 @@ const ACTION_WIDTH = 68;
 type ProductCardProps = {
   product: Product;
   currency?: CurrencyConfig;
+  onDetailPress?: () => void;
 };
 
 // ---------------------------------------------------------------------------
@@ -51,7 +52,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function ProductCard({ product, currency }: ProductCardProps) {
+export function ProductCard({ product, currency, onDetailPress }: ProductCardProps) {
   const curr = currency ?? DEFAULT_CURRENCY;
   const stockInt = Math.floor(product.stock_actual);
   const stockVariant = getStockVariant(stockInt);
@@ -101,7 +102,7 @@ export function ProductCard({ product, currency }: ProductCardProps) {
             backgroundColor: theme.colors.cardBackground,
             borderColor: theme.colors.border,
           }]}
-          onPress={() => swipeableRef.current?.close()}
+          onPress={() => { swipeableRef.current?.close(); onDetailPress?.(); }}
           activeOpacity={0.75}
         >
           <BarChart2 size={18} color={theme.colors.info} />

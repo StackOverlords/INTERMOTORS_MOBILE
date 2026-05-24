@@ -13,3 +13,4 @@ export { IconBadge } from './IconBadge';
 export { Spinner } from './Spinner';
 export * from './lists';
 export * from './filters';
+export * from './details';

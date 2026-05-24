@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { DeclarativeList } from '@/shared/components';
-import type { DrawerScreenPropsHelper } from '@/navigation';
+import type { ProductsStackParamList } from '@/navigation/types';
 import type { FilterFieldConfig } from '@/shared/types/filter.types';
 import { useCategories } from '@/shared/hooks/useCategories';
 import { useBrands } from '@/shared/hooks/useBrands';
@@ -12,7 +14,8 @@ import { useProductFilters } from '../hooks/useProductFilters';
 import { DEFAULT_PRODUCT_FILTERS } from '../types/product.types';
 import type { Product } from '../types/product.types';
 
-export function ProductsListScreen(_props: DrawerScreenPropsHelper<'Products'>) {
+export function ProductsListScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<ProductsStackParamList>>();
   const filters = useProductFilters();
   const { data, isLoading, isFetching, isError, error, refetch, fetchNextPage, isFetchingNextPage, hasNextPage } =
     useProducts(filters.activeFilters);
@@ -34,7 +37,7 @@ export function ProductsListScreen(_props: DrawerScreenPropsHelper<'Products'>) 
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(p) => String(p.id)}
-      renderItem={(p) => <ProductCard product={p} />}
+      renderItem={(p) => <ProductCard product={p} onDetailPress={() => navigation.navigate('ProductDetail', { id: p.id })} />}
       filterFields={DEFAULT_PRODUCT_FILTERS}
       filterValues={filters.activeFilters}
       onFilterChange={filters.handleChange}

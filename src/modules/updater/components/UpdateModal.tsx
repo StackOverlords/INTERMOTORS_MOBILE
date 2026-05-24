@@ -47,6 +47,7 @@ export function UpdateModal() {
       backdropComponent={Backdrop}
       backgroundStyle={{ backgroundColor: colors.cardBackground }}
       handleIndicatorStyle={{ backgroundColor: colors.border }}
+      statusBarTranslucent={false}
     >
       <BottomSheetView style={styles.container}>
         <Box

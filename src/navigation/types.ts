@@ -37,6 +37,29 @@ export type DrawerParamList = {
 };
 
 // ---------------------------------------------------------------------------
+// Detail stack param lists — Stack inside Drawer for the 4 modules with getById
+// ---------------------------------------------------------------------------
+export type ProductsStackParamList = {
+  ProductsList: undefined;
+  ProductDetail: { id: number };
+};
+
+export type SalesStackParamList = {
+  SalesList: undefined;
+  SaleDetail: { id: number };
+};
+
+export type OrdersStackParamList = {
+  OrdersList: undefined;
+  OrderDetail: { id: number };
+};
+
+export type QuotationsStackParamList = {
+  QuotationsList: undefined;
+  QuotationDetail: { id: number };
+};
+
+// ---------------------------------------------------------------------------
 // Screen prop helpers
 // ---------------------------------------------------------------------------
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

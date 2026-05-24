@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
   Text as RNText,
   TouchableOpacity,
   ScrollView,
-  Modal,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   createDrawerNavigator,
   type DrawerContentComponentProps,
 } from '@react-navigation/drawer';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { useTheme } from '@shopify/restyle';
 import {
   Package,
   ShoppingCart,
   FileText,
-  Menu,
   Sun,
   Moon,
   Monitor,
@@ -33,8 +30,6 @@ import {
   ArrowLeftRight,
   CreditCard,
   Settings as SettingsIcon,
-  ChevronDown,
-  Check,
 } from 'lucide-react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -45,12 +40,13 @@ import { useLogout } from '@/modules/auth/hooks/useLogout';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import type { DrawerParamList } from './types';
 import { TreeMenu, type TreeMenuSection } from '@/shared/navigation';
+import { DrawerToggleButton, BranchPickerTitle } from '@/navigation/components';
 
-// Existing screens
-import { ProductsListScreen } from '@/modules/products/screens/ProductsListScreen';
-import { OrdersListScreen } from '@/modules/orders/screens/OrdersListScreen';
-import { SalesListScreen } from '@/modules/sales/screens/SalesListScreen';
-import { QuotationsListScreen } from '@/modules/quotations/screens/QuotationsListScreen';
+// Stack navigators for modules with detail screens
+import { ProductsStackNavigator } from '@/navigation/stacks/ProductsStackNavigator';
+import { SalesStackNavigator } from '@/navigation/stacks/SalesStackNavigator';
+import { OrdersStackNavigator } from '@/navigation/stacks/OrdersStackNavigator';
+import { QuotationsStackNavigator } from '@/navigation/stacks/QuotationsStackNavigator';
 
 // New stub screens
 import { PurchasesListScreen } from '@/modules/purchases/screens/PurchasesListScreen';
@@ -196,134 +192,6 @@ function UserProfileCard(): React.JSX.Element {
 }
 
 // ---------------------------------------------------------------------------
-// BranchPickerTitle — header center: shows active branch, opens dropdown to switch
-// Hidden picker if user only has one branch.
-// ---------------------------------------------------------------------------
-function BranchPickerTitle(): React.JSX.Element {
-  const { colors } = useTheme<Theme>();
-  const user = useAuthStore((s) => s.user);
-  const selectedBranchId = useAuthStore((s) => s.selectedBranchId);
-  const setBranch = useAuthStore((s) => s.setBranch);
-  const [visible, setVisible] = useState(false);
-
-  const sucursales = user?.sucursales ?? [];
-  const activeBranch =
-    sucursales.find((s) => s.id === selectedBranchId) ?? sucursales[0] ?? null;
-
-  const handleSelect = async (branchId: number): Promise<void> => {
-    await AsyncStorage.setItem('intermotors_branch_id', String(branchId));
-    setBranch(branchId);
-    setVisible(false);
-  };
-
-  if (!activeBranch) return <View />;
-
-  // Single branch — no picker, just the name
-  if (sucursales.length <= 1) {
-    return (
-      <RNText style={[styles.headerBranchTitle, { color: colors.text }]} numberOfLines={1}>
-        {activeBranch.sucursal}
-      </RNText>
-    );
-  }
-
-  return (
-    <>
-      <TouchableOpacity
-        onPress={() => setVisible(true)}
-        style={styles.branchPickerTrigger}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        activeOpacity={0.7}
-      >
-        <RNText style={[styles.headerBranchTitle, { color: colors.text }]} numberOfLines={1}>
-          {activeBranch.sucursal}
-        </RNText>
-        <ChevronDown size={14} color={colors.textSecondary} />
-      </TouchableOpacity>
-
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setVisible(false)}
-        >
-          <View
-            style={[
-              styles.branchDropdown,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            {sucursales.map((branch) => {
-              const isActive = branch.id === selectedBranchId;
-              return (
-                <TouchableOpacity
-                  key={branch.id}
-                  onPress={() => void handleSelect(branch.id)}
-                  style={[
-                    styles.branchOption,
-                    isActive && { backgroundColor: colors.primary + '15' },
-                  ]}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.siglaPillSmall,
-                      { backgroundColor: isActive ? colors.primary + '25' : colors.border },
-                    ]}
-                  >
-                    <RNText
-                      style={[
-                        styles.siglaTextSmall,
-                        { color: isActive ? colors.primary : colors.textSecondary },
-                      ]}
-                    >
-                      {branch.sigla}
-                    </RNText>
-                  </View>
-                  <RNText
-                    style={[
-                      styles.branchOptionText,
-                      { color: isActive ? colors.primary : colors.text },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {branch.sucursal}
-                  </RNText>
-                  {isActive && <Check size={14} color={colors.primary} />}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Custom drawer toggle button — avoids @react-navigation/drawer PNG asset bug
-// ---------------------------------------------------------------------------
-function DrawerToggleButton(): React.JSX.Element {
-  const { colors } = useTheme<Theme>();
-  const navigation = useNavigation();
-
-  return (
-    <TouchableOpacity
-      onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-      style={{ paddingHorizontal: 16, paddingVertical: 8 }}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-    >
-      <Menu color={colors.text} size={24} />
-    </TouchableOpacity>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Theme selector — quick brightness toggle: light / system / dark
 // Full theme collection is in the Settings screen.
 // ---------------------------------------------------------------------------
@@ -460,8 +328,10 @@ export function MainNavigator(): React.JSX.Element {
     >
       <Drawer.Screen
         name="Products"
-        component={ProductsListScreen}
-        options={{ title: 'Productos' }}
+        component={ProductsStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'ProductDetail',
+        })}
       />
       <Drawer.Screen
         name="Inventory"
@@ -475,8 +345,10 @@ export function MainNavigator(): React.JSX.Element {
       />
       <Drawer.Screen
         name="Sales"
-        component={SalesListScreen}
-        options={{ title: 'Ventas' }}
+        component={SalesStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'SaleDetail',
+        })}
       />
       <Drawer.Screen
         name="SalesReport"
@@ -490,8 +362,10 @@ export function MainNavigator(): React.JSX.Element {
       />
       <Drawer.Screen
         name="Orders"
-        component={OrdersListScreen}
-        options={{ title: 'Pedidos' }}
+        component={OrdersStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'OrderDetail',
+        })}
       />
       <Drawer.Screen
         name="Purchases"
@@ -500,8 +374,10 @@ export function MainNavigator(): React.JSX.Element {
       />
       <Drawer.Screen
         name="Quotations"
-        component={QuotationsListScreen}
-        options={{ title: 'Cotizaciones' }}
+        component={QuotationsStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'QuotationDetail',
+        })}
       />
       <Drawer.Screen
         name="Transfers"
@@ -645,55 +521,5 @@ const styles = StyleSheet.create({
   logoutLabel: {
     fontSize: 12,
     fontWeight: '500',
-  },
-  // BranchPickerTitle
-  branchPickerTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    maxWidth: 180,
-  },
-  headerBranchTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    flexShrink: 1,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    paddingTop: 56,
-    paddingHorizontal: 32,
-  },
-  branchDropdown: {
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-  },
-  branchOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-  },
-  branchOptionText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  siglaPillSmall: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  siglaTextSmall: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 0.5,
   },
 });
