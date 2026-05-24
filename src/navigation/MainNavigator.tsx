@@ -32,7 +32,6 @@ import {
   ClipboardList,
   ArrowLeftRight,
   CreditCard,
-  Bell,
   Settings as SettingsIcon,
   ChevronDown,
   Check,
@@ -46,12 +45,6 @@ import { useLogout } from '@/modules/auth/hooks/useLogout';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import type { DrawerParamList } from './types';
 import { TreeMenu, type TreeMenuSection } from '@/shared/navigation';
-import { IconBadge } from '@/shared/components';
-import { useCartStore, selectCartCount } from '@/modules/cart/stores/cartStore';
-import {
-  useNotificationsStore,
-  selectUnreadCount,
-} from '@/modules/notifications/stores/notificationsStore';
 
 // Existing screens
 import { ProductsListScreen } from '@/modules/products/screens/ProductsListScreen';
@@ -313,28 +306,6 @@ function BranchPickerTitle(): React.JSX.Element {
 }
 
 // ---------------------------------------------------------------------------
-// Header right icons — ShoppingCart (left) + Bell (right/last)
-// ---------------------------------------------------------------------------
-function HeaderIcons(): React.JSX.Element {
-  const { colors } = useTheme<Theme>();
-  const cartCount = useCartStore(selectCartCount);
-  const notifCount = useNotificationsStore(selectUnreadCount);
-
-  return (
-    <View style={styles.headerIconsRow}>
-      <IconBadge
-        icon={<ShoppingCart color={colors.text} size={22} />}
-        count={cartCount}
-      />
-      <IconBadge
-        icon={<Bell color={colors.text} size={22} />}
-        count={notifCount}
-      />
-    </View>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Custom drawer toggle button — avoids @react-navigation/drawer PNG asset bug
 // ---------------------------------------------------------------------------
 function DrawerToggleButton(): React.JSX.Element {
@@ -485,7 +456,6 @@ export function MainNavigator(): React.JSX.Element {
         headerTintColor: colors.text,
         headerTitle: () => <BranchPickerTitle />,
         headerLeft: () => <DrawerToggleButton />,
-        headerRight: () => <HeaderIcons />,
       }}
     >
       <Drawer.Screen
@@ -566,12 +536,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerIconsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingRight: 8,
   },
   profileRow: {
     flexDirection: 'row',
