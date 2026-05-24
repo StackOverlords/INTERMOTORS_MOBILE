@@ -1,0 +1,1 @@
+export { GenericFilterChips } from './GenericFilterChips';
