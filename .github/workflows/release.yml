@@ -38,7 +38,6 @@ jobs:
       - name: Create .env
         run: |
           echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> .env
-          echo "BRANCH_STORAGE_KEY=${{ secrets.BRANCH_STORAGE_KEY }}" >> .env
           echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> .env
 
       - name: Build release APK
