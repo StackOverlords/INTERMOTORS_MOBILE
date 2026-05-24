@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 
-import { ENV } from '@/config/environment';
 import { fetchLatestRelease, isNewerVersion } from '../services/updater.service';
 import type { ReleaseInfo, UpdateStatus } from '../types/updater.types';
 
@@ -38,7 +37,6 @@ export function useAppUpdater() {
       const { promise } = RNFS.downloadFile({
         fromUrl: release.apkUrl,
         toFile: APK_DEST,
-        headers: { Authorization: `Bearer ${ENV.GITHUB_TOKEN}` },
         progressInterval: 300,
         progress: ({ bytesWritten, contentLength }) => {
           setProgress(bytesWritten / contentLength);

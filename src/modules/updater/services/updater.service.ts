@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { ENV } from '@/config/environment';
 import type { ReleaseInfo } from '../types/updater.types';
 
 const RELEASES_URL =
@@ -19,10 +18,7 @@ interface GithubRelease {
 
 export async function fetchLatestRelease(): Promise<ReleaseInfo> {
   const { data } = await axios.get<GithubRelease>(RELEASES_URL, {
-    headers: {
-      Authorization: `Bearer ${ENV.GITHUB_TOKEN}`,
-      Accept: 'application/vnd.github+json',
-    },
+    headers: { Accept: 'application/vnd.github+json' },
   });
 
   const apkAsset = data.assets.find((a) => a.name.endsWith('.apk'));
