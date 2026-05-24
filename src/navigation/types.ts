@@ -29,7 +29,6 @@ export type DrawerParamList = {
   Purchases: undefined;
   Transfers: undefined;
   AccountsReceivable: undefined;
-  MinStock: undefined;
   Inventory: undefined;
   Utilities: undefined;
   SalesReport: undefined;

@@ -24,7 +24,6 @@ import {
   Monitor,
   LogOut,
   List,
-  AlertTriangle,
   Archive,
   TrendingUp,
   ShoppingBag,
@@ -64,7 +63,6 @@ import { QuotationsListScreen } from '@/modules/quotations/screens/QuotationsLis
 import { PurchasesListScreen } from '@/modules/purchases/screens/PurchasesListScreen';
 import { TransfersListScreen } from '@/modules/transfers/screens/TransfersListScreen';
 import { AccountsReceivableScreen } from '@/modules/accounts/screens/AccountsReceivableScreen';
-import { MinStockScreen } from '@/modules/inventory/screens/MinStockScreen';
 import { InventoryScreen } from '@/modules/inventory/screens/InventoryScreen';
 import { UtilitiesScreen } from '@/modules/inventory/screens/UtilitiesScreen';
 import { SalesReportScreen } from '@/modules/reports/screens/SalesReportScreen';
@@ -81,7 +79,6 @@ const TREE_SECTIONS: TreeMenuSection[] = [
     icon: Package,
     items: [
       { label: 'Lista', routeName: 'Products', icon: List },
-      { label: 'Stock Mínimo', routeName: 'MinStock', icon: AlertTriangle },
       { label: 'Inventario', routeName: 'Inventory', icon: Archive },
       { label: 'Utilidades', routeName: 'Utilities', icon: TrendingUp },
     ],
@@ -495,11 +492,6 @@ export function MainNavigator(): React.JSX.Element {
         name="Products"
         component={ProductsListScreen}
         options={{ title: 'Productos' }}
-      />
-      <Drawer.Screen
-        name="MinStock"
-        component={MinStockScreen}
-        options={{ title: 'Stock Mínimo' }}
       />
       <Drawer.Screen
         name="Inventory"
