@@ -13,6 +13,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { AppThemeProvider } from '@/themes';
 import { navigationRef, RootNavigator } from '@/navigation';
+import { UpdateModal } from '@/modules/updater';
 
 // ---------------------------------------------------------------------------
 // Query client — single instance, lives for the app lifetime
@@ -40,6 +41,7 @@ export default function App(): React.JSX.Element {
               <NavigationContainer ref={navigationRef}>
                 <RootNavigator />
               </NavigationContainer>
+              <UpdateModal />
             </BottomSheetModalProvider>
           </QueryClientProvider>
         </AppThemeProvider>
