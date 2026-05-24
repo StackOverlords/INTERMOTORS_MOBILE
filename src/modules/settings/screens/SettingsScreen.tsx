@@ -7,7 +7,10 @@ import {
   View,
 } from 'react-native';
 import { useTheme } from '@shopify/restyle';
-import { Bell, Check, ChevronRight } from 'lucide-react-native';
+import { Bell, Check, ChevronRight, RefreshCw, CheckCircle } from 'lucide-react-native';
+
+import { ENV } from '@/config/environment';
+import { useUpdaterStore } from '@/modules/updater/stores/updaterStore';
 
 import type { Theme } from '@/themes/theme';
 import { THEME_COLLECTION, type ThemeMeta } from '@/themes/theme';
@@ -197,8 +200,13 @@ export function SettingsScreen(): React.JSX.Element {
   const themeId = useThemeStore((s) => s.themeId);
   const setThemeId = useThemeStore((s) => s.setThemeId);
 
-  // Stub state for system settings (will be wired to a store later)
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+
+  const updateStatus = useUpdaterStore((s) => s.status);
+  const updateRelease = useUpdaterStore((s) => s.release);
+  const requestPresent = useUpdaterStore((s) => s.requestPresent);
+
+  const hasUpdate = updateStatus === 'available';
 
   return (
     <Box flex={1} backgroundColor="background">
@@ -217,6 +225,26 @@ export function SettingsScreen(): React.JSX.Element {
             toggle
             value={notificationsEnabled}
             onValueChange={setNotificationsEnabled}
+          />
+        </View>
+
+        {/* ── APLICACIÓN ───────────────────────────────────────────────── */}
+        <SectionHeader label="Aplicación" />
+
+        <View style={[styles.settingGroup, { borderColor: colors.border }]}>
+          <SettingRow
+            icon={
+              hasUpdate
+                ? <RefreshCw size={15} color={colors.warning} />
+                : <CheckCircle size={15} color={colors.success} />
+            }
+            title="Versión"
+            subtitle={
+              hasUpdate
+                ? `v${ENV.APP_VERSION} · Actualización disponible: v${updateRelease?.version}`
+                : `v${ENV.APP_VERSION} · Actualizada`
+            }
+            onPress={hasUpdate ? requestPresent : undefined}
           />
         </View>
 

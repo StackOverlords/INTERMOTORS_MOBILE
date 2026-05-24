@@ -9,6 +9,7 @@ import { Box, Text } from '@/themes';
 import type { Theme } from '@/themes';
 import { Button } from '@/shared/components/Button';
 import { useAppUpdater } from '../hooks/useAppUpdater';
+import { useUpdaterStore } from '../stores/updaterStore';
 
 function Backdrop(props: BottomSheetBackdropProps) {
   return <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />;
@@ -17,15 +18,23 @@ function Backdrop(props: BottomSheetBackdropProps) {
 export function UpdateModal() {
   const { colors } = useTheme<Theme>();
   const ref = useRef<BottomSheetModal>(null);
-  const { status, release, progress, downloadAndInstall, dismiss } = useAppUpdater();
+
+  useAppUpdater();
+
+  const status = useUpdaterStore((s) => s.status);
+  const release = useUpdaterStore((s) => s.release);
+  const progress = useUpdaterStore((s) => s.progress);
+  const shouldPresent = useUpdaterStore((s) => s.shouldPresent);
+  const downloadAndInstall = useUpdaterStore((s) => s.downloadAndInstall);
+  const dismiss = useUpdaterStore((s) => s.dismiss);
 
   useEffect(() => {
-    if (status === 'available') {
+    if (shouldPresent) {
       ref.current?.present();
-    } else if (status === 'up_to_date') {
+    } else {
       ref.current?.dismiss();
     }
-  }, [status]);
+  }, [shouldPresent]);
 
   const isDownloading = status === 'downloading';
   const progressPercent = Math.round(progress * 100);
