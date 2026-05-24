@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 
+import { ENV } from '@/config/environment';
 import { fetchLatestRelease, isNewerVersion } from '../services/updater.service';
 import type { ReleaseInfo, UpdateStatus } from '../types/updater.types';
 
@@ -22,7 +23,8 @@ export function useAppUpdater() {
       } else {
         setStatus('up_to_date');
       }
-    } catch {
+    } catch (e) {
+      console.warn('[Updater] check failed:', e);
       setStatus('error');
     }
   }, []);
@@ -46,7 +48,8 @@ export function useAppUpdater() {
       await promise;
       setStatus('ready_to_install');
       await FileViewer.open(APK_DEST, { showOpenWithDialog: false });
-    } catch {
+    } catch (e) {
+      console.warn('[Updater] download failed:', e);
       setStatus('error');
     }
   }, [release]);

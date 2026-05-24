@@ -1,104 +1,140 @@
-import React from 'react';
-import { Modal, View, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet } from 'react-native';
+import { BottomSheetModal, BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useTheme } from '@shopify/restyle';
+import { Download, RefreshCw } from 'lucide-react-native';
 
 import { Box, Text } from '@/themes';
 import type { Theme } from '@/themes';
 import { Button } from '@/shared/components/Button';
 import { useAppUpdater } from '../hooks/useAppUpdater';
 
+function Backdrop(props: BottomSheetBackdropProps) {
+  return <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />;
+}
+
 export function UpdateModal() {
   const { colors } = useTheme<Theme>();
+  const ref = useRef<BottomSheetModal>(null);
   const { status, release, progress, downloadAndInstall, dismiss } = useAppUpdater();
 
-  if (status !== 'available' && status !== 'downloading' && status !== 'ready_to_install') {
-    return null;
-  }
+  useEffect(() => {
+    if (status === 'available') {
+      ref.current?.present();
+    } else if (status === 'up_to_date') {
+      ref.current?.dismiss();
+    }
+  }, [status]);
 
   const isDownloading = status === 'downloading';
   const progressPercent = Math.round(progress * 100);
 
   return (
-    <Modal transparent animationType="fade" visible statusBarTranslucent>
-      <View style={[styles.overlay, { backgroundColor: colors.text + '99' }]}>
+    <BottomSheetModal
+      ref={ref}
+      enablePanDownToClose={!isDownloading}
+      onDismiss={dismiss}
+      backdropComponent={Backdrop}
+      backgroundStyle={{ backgroundColor: colors.cardBackground }}
+      handleIndicatorStyle={{ backgroundColor: colors.border }}
+    >
+      <BottomSheetView style={styles.container}>
         <Box
-          backgroundColor="cardBackground"
+          width={48}
+          height={48}
           borderRadius="l"
-          padding="l"
-          marginHorizontal="l"
+          backgroundColor="infoBackground"
+          alignItems="center"
+          justifyContent="center"
+          marginBottom="m"
         >
-          <Text variant="subheader" marginBottom="s">
-            Nueva versión disponible
-          </Text>
+          <RefreshCw size={24} color={colors.info} />
+        </Box>
 
+        <Text variant="subheader" marginBottom="xs">
+          Nueva versión disponible
+        </Text>
+
+        <Box flexDirection="row" alignItems="center" gap="s" marginBottom="m">
+          <Text variant="caption" color="textSecondary">
+            Versión actual
+          </Text>
+          <Box backgroundColor="border" width={1} height={10} />
+          <Text variant="caption" color="info" style={styles.versionText}>
+            v{release?.version} disponible
+          </Text>
+        </Box>
+
+        {!!release?.releaseNotes && (
           <Box
-            flexDirection="row"
-            alignItems="center"
-            backgroundColor="infoBackground"
+            backgroundColor="surface"
             borderRadius="m"
-            padding="s"
+            padding="m"
             marginBottom="m"
           >
-            <Text color="info" style={styles.versionBadge}>
-              v{release?.version}
-            </Text>
-          </Box>
-
-          {!!release?.releaseNotes && (
-            <Text variant="body" color="textSecondary" marginBottom="m">
+            <Text variant="caption" color="textSecondary">
               {release.releaseNotes}
             </Text>
-          )}
+          </Box>
+        )}
 
-          {isDownloading && (
-            <Box marginBottom="m">
+        {isDownloading && (
+          <Box marginBottom="m">
+            <Box
+              height={6}
+              backgroundColor="border"
+              borderRadius="full"
+              overflow="hidden"
+              marginBottom="xs"
+            >
               <Box
                 height={6}
-                backgroundColor="border"
+                backgroundColor="primary"
                 borderRadius="full"
-                overflow="hidden"
-              >
-                <Box
-                  height={6}
-                  backgroundColor="primary"
-                  borderRadius="full"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </Box>
-              <Text variant="caption" textAlign="right" marginTop="xs">
-                {progressPercent}%
-              </Text>
+                style={{ width: `${progressPercent}%` }}
+              />
             </Box>
-          )}
+            <Text variant="caption" color="textSecondary" textAlign="right">
+              Descargando... {progressPercent}%
+            </Text>
+          </Box>
+        )}
 
-          <Box flexDirection="row" justifyContent="flex-end" gap="s">
-            {!isDownloading && (
+        <Box flexDirection="row" gap="s" marginBottom="s">
+          {!isDownloading && (
+            <Box flex={1}>
               <Button
                 label="Más tarde"
-                variant="ghost"
-                onPress={dismiss}
+                variant="secondary"
+                fullWidth
+                onPress={() => ref.current?.dismiss()}
               />
-            )}
+            </Box>
+          )}
+          <Box flex={1}>
             <Button
-              label={isDownloading ? 'Descargando...' : 'Actualizar'}
+              label={isDownloading ? `${progressPercent}%` : 'Actualizar'}
               variant="primary"
+              fullWidth
               loading={isDownloading}
+              leftIcon={!isDownloading ? <Download size={16} color={colors.textInverse} /> : undefined}
               onPress={downloadAndInstall}
             />
           </Box>
         </Box>
-      </View>
-    </Modal>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
+  container: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 32,
   },
-  versionBadge: {
-    fontSize: 13,
+  versionText: {
     fontWeight: '600',
   },
 });
