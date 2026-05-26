@@ -1,3 +1,47 @@
+import type { FilterFieldConfig, SelectOption } from '@/shared/types/filter.types';
+
+// ---------------------------------------------------------------------------
+// OrdersFilters — flat map of query params for the orders list.
+// Numeric IDs are kept as strings here — coerced to number in service layer.
+// ---------------------------------------------------------------------------
+export type OrdersFilters = Partial<{
+  codigo_interno: string;      // numeric as string — coerced to number in service
+  proveedor: string;           // numeric ID as string — coerced to number in service
+  keywords: string;
+  situacion_actual: string;    // P | C | T | A | D
+  fecha_inicio: string;
+  fecha_fin: string;
+  codigo_oem_producto: string;
+}>;
+
+// ---------------------------------------------------------------------------
+// SITUACION_ACTUAL_OPTIONS — select options for situacion_actual filter
+// ---------------------------------------------------------------------------
+export const SITUACION_ACTUAL_OPTIONS: SelectOption[] = [
+  { label: 'Preparación', value: 'P' },
+  { label: 'Cotización', value: 'C' },
+  { label: 'Tránsito', value: 'T' },
+  { label: 'Almacén', value: 'A' },
+  { label: 'Disponible', value: 'D' },
+];
+
+// ---------------------------------------------------------------------------
+// DEFAULT_ORDERS_FILTERS — config-driven filter fields for the orders list.
+// 4 always-visible + 3 toggleable fields.
+// ---------------------------------------------------------------------------
+export const DEFAULT_ORDERS_FILTERS: FilterFieldConfig[] = [
+  // --- Always-visible fields ---
+  { key: 'codigo_interno',      label: 'Nro. Pedido',    type: 'number', enabled: true,  toggleable: false, placeholder: 'Número de pedido...' },
+  { key: 'proveedor',           label: 'Proveedor (ID)', type: 'number', enabled: true,  toggleable: false, placeholder: 'ID del proveedor...' },
+  { key: 'keywords',            label: 'Buscar',         type: 'text',   enabled: true,  toggleable: false, placeholder: 'Comentarios, comprobante...' },
+  { key: 'situacion_actual',    label: 'Estado actual',  type: 'select', enabled: true,  toggleable: false },
+
+  // --- Optional/toggleable fields ---
+  { key: 'fecha_inicio',        label: 'Desde',          type: 'date',   enabled: false, toggleable: true, placeholder: 'YYYY-MM-DD' },
+  { key: 'fecha_fin',           label: 'Hasta',          type: 'date',   enabled: false, toggleable: true, placeholder: 'YYYY-MM-DD' },
+  { key: 'codigo_oem_producto', label: 'Código OEM',     type: 'text',   enabled: false, toggleable: true, placeholder: 'Código OEM del producto...' },
+];
+
 // ---------------------------------------------------------------------------
 // Order — mirrors the desktop OrderGetSchema fields used in mobile
 // Endpoint: GET /placeorders (list) and GET /placeorders/:id (detail)

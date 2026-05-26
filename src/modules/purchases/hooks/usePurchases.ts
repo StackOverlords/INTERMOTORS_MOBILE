@@ -3,19 +3,21 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 
 import { purchasesService } from '../services/purchases.service';
+import type { PurchasesFilters } from '../types/purchase.types';
 
 const PAGE_SIZE = 20;
 
 // ---------------------------------------------------------------------------
 // usePurchases — paginated list of purchases for the selected branch.
+// Filters change → queryKey changes → React Query resets to page 1 automatically.
 // Guard: query disabled when selectedBranchId is null.
 // ---------------------------------------------------------------------------
-export function usePurchases() {
+export function usePurchases(filters: PurchasesFilters = {}) {
   const sucursalId = useAuthStore((s) => s.selectedBranchId);
 
   return useInfiniteQuery({
-    queryKey: ['purchases', sucursalId],
-    queryFn: ({ pageParam }) => purchasesService.getPurchases(sucursalId!, pageParam, PAGE_SIZE),
+    queryKey: ['purchases', sucursalId, filters],
+    queryFn: ({ pageParam }) => purchasesService.getPurchases(sucursalId!, pageParam, PAGE_SIZE, filters),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const nextPage = allPages.length + 1;

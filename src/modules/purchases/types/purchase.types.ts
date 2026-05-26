@@ -1,3 +1,34 @@
+import type { FilterFieldConfig } from '@/shared/types/filter.types';
+
+// ---------------------------------------------------------------------------
+// PurchasesFilters — flat map of query params for the purchases list
+// Numeric IDs are kept as strings here — coerced to number in service layer
+// ---------------------------------------------------------------------------
+export type PurchasesFilters = Partial<{
+  codigo_interno: string;         // numeric as string — coerced to number in service
+  proveedor: string;              // numeric ID as string — coerced to number in service
+  keywords: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  codigo_oem_producto: string;
+}>;
+
+// ---------------------------------------------------------------------------
+// DEFAULT_PURCHASES_FILTERS — config-driven filter fields for the purchases list.
+// 3 always-visible + 3 toggleable fields.
+// ---------------------------------------------------------------------------
+export const DEFAULT_PURCHASES_FILTERS: FilterFieldConfig[] = [
+  // --- Always-visible fields ---
+  { key: 'codigo_interno',      label: 'Nro. Compra',    type: 'number', enabled: true,  toggleable: false, placeholder: 'Número de compra...' },
+  { key: 'proveedor',           label: 'Proveedor (ID)', type: 'number', enabled: true,  toggleable: false, placeholder: 'ID del proveedor...' },
+  { key: 'keywords',            label: 'Buscar',         type: 'text',   enabled: true,  toggleable: false, placeholder: 'Comentarios, comprobante...' },
+
+  // --- Optional/toggleable fields ---
+  { key: 'fecha_inicio',        label: 'Desde',          type: 'date',   enabled: false, toggleable: true,  placeholder: 'YYYY-MM-DD' },
+  { key: 'fecha_fin',           label: 'Hasta',          type: 'date',   enabled: false, toggleable: true,  placeholder: 'YYYY-MM-DD' },
+  { key: 'codigo_oem_producto', label: 'Código OEM',     type: 'text',   enabled: false, toggleable: true,  placeholder: 'Código OEM del producto...' },
+];
+
 // ---------------------------------------------------------------------------
 // PurchaseProvider — mirrors desktop purchaseProviderGetSchema fields
 // ---------------------------------------------------------------------------

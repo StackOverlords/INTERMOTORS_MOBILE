@@ -1,3 +1,40 @@
+import type { FilterFieldConfig } from '@/shared/types/filter.types';
+
+// ---------------------------------------------------------------------------
+// TransfersFilters — flat map of query params for the transfers list.
+// Numeric IDs are kept as strings here — coerced to number in service layer.
+// ---------------------------------------------------------------------------
+export type TransfersFilters = Partial<{
+  codigo_interno: string;      // numeric as string — coerced to number in service
+  keywords: string;
+  estado_a_sucursal: string;   // boolean sent as string — passed as-is to backend
+  estado_en_sucursal: string;  // boolean sent as string — passed as-is to backend
+  sucursal_origen: string;     // numeric ID as string — coerced to number in service
+  sucursal_destino: string;    // numeric ID as string — coerced to number in service
+  fecha_inicio: string;
+  fecha_fin: string;
+  codigo_oem_producto: string;
+}>;
+
+// ---------------------------------------------------------------------------
+// DEFAULT_TRANSFERS_FILTERS — config-driven filter fields for the transfers list.
+// 4 always-visible + 5 toggleable fields.
+// ---------------------------------------------------------------------------
+export const DEFAULT_TRANSFERS_FILTERS: FilterFieldConfig[] = [
+  // --- Always-visible fields ---
+  { key: 'codigo_interno',      label: 'Nro. Traslado',    type: 'number',  enabled: true,  toggleable: false, placeholder: 'Número de traslado...' },
+  { key: 'keywords',            label: 'Buscar',           type: 'text',    enabled: true,  toggleable: false, placeholder: 'Comentarios, comprobante...' },
+  { key: 'estado_a_sucursal',   label: 'Transferido',      type: 'boolean', enabled: true,  toggleable: false },
+  { key: 'estado_en_sucursal',  label: 'Recepcionado',     type: 'boolean', enabled: true,  toggleable: false },
+
+  // --- Optional/toggleable fields ---
+  { key: 'sucursal_origen',     label: 'Sucursal origen',  type: 'number',  enabled: false, toggleable: true, placeholder: 'ID sucursal origen...' },
+  { key: 'sucursal_destino',    label: 'Sucursal destino', type: 'number',  enabled: false, toggleable: true, placeholder: 'ID sucursal destino...' },
+  { key: 'fecha_inicio',        label: 'Desde',            type: 'date',    enabled: false, toggleable: true, placeholder: 'YYYY-MM-DD' },
+  { key: 'fecha_fin',           label: 'Hasta',            type: 'date',    enabled: false, toggleable: true, placeholder: 'YYYY-MM-DD' },
+  { key: 'codigo_oem_producto', label: 'Código OEM',       type: 'text',    enabled: false, toggleable: true, placeholder: 'Código OEM del producto...' },
+];
+
 // ---------------------------------------------------------------------------
 // TransferSucursal — branch shape as returned in origen/destino fields
 // ---------------------------------------------------------------------------

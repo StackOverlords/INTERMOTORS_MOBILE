@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { Dimensions, FlatList, Modal, Pressable, Switch, TextInput } from 'react-native';
+import { Dimensions, FlatList, Modal, Platform, Pressable, Switch, TextInput } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -7,7 +8,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { useTheme } from '@shopify/restyle';
-import { Check, ChevronDown, ChevronUp, Search } from 'lucide-react-native';
+import { Calendar, Check, ChevronDown, ChevronUp, Search, X } from 'lucide-react-native';
 
 import { Box, Text } from '@/themes';
 import type { Theme } from '@/themes';
@@ -164,6 +165,154 @@ function SelectInput({ value, options, placeholder, onSelect, theme }: SelectInp
           </Pressable>
         </Pressable>
       </Modal>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DatePickerInput — native date picker para campos type='date'
+// ---------------------------------------------------------------------------
+interface DatePickerInputProps {
+  value: string | undefined;
+  placeholder?: string;
+  onChange: (value: string) => void;
+  theme: ReturnType<typeof useTheme<Theme>>;
+}
+
+function parseISODate(s: string): Date {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function formatISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+function DatePickerInput({ value, placeholder, onChange, theme }: DatePickerInputProps) {
+  const [show, setShow] = useState(false);
+  const [iosDraft, setIosDraft] = useState<Date | null>(null);
+
+  const currentDate = value ? parseISODate(value) : new Date();
+
+  function handleAndroidChange(_event: any, selected?: Date) {
+    setShow(false);
+    if (selected) {
+      onChange(formatISODate(selected));
+    }
+  }
+
+  function handleIOSChange(_event: any, selected?: Date) {
+    if (selected) {
+      setIosDraft(selected);
+    }
+  }
+
+  function confirmIOS() {
+    if (iosDraft) {
+      onChange(formatISODate(iosDraft));
+    }
+    setShow(false);
+    setIosDraft(null);
+  }
+
+  function cancelIOS() {
+    setShow(false);
+    setIosDraft(null);
+  }
+
+  return (
+    <>
+      <Pressable onPress={() => setShow(true)}>
+        <Box
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+          borderWidth={1}
+          borderColor={value ? 'primary' : 'border'}
+          borderRadius="m"
+          backgroundColor="surface"
+          paddingHorizontal="m"
+          style={{ height: 44, gap: 8 }}
+        >
+          <Calendar size={16} color={value ? theme.colors.primary : theme.colors.textSecondary} />
+          <Text
+            style={{ fontSize: 14, flex: 1 }}
+            color={value ? 'text' : 'textSecondary'}
+          >
+            {value ?? placeholder ?? 'Seleccionar fecha…'}
+          </Text>
+          {value ? (
+            <Pressable
+              onPress={e => { e.stopPropagation(); onChange(''); }}
+              hitSlop={8}
+            >
+              <X size={15} color={theme.colors.textSecondary} />
+            </Pressable>
+          ) : null}
+        </Box>
+      </Pressable>
+
+      {Platform.OS === 'android' && show && (
+        <DateTimePicker
+          value={currentDate}
+          mode="date"
+          display="default"
+          onChange={handleAndroidChange}
+        />
+      )}
+
+      {Platform.OS === 'ios' && (
+        <Modal
+          visible={show}
+          transparent
+          animationType="fade"
+          onRequestClose={cancelIOS}
+        >
+          <Pressable
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' }}
+            onPress={cancelIOS}
+          >
+            <Pressable onPress={e => e.stopPropagation()}>
+              <Box
+                backgroundColor="cardBackground"
+                style={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}
+              >
+                {/* Handle */}
+                <Box alignItems="center" paddingTop="s" paddingBottom="xs">
+                  <Box style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: theme.colors.border }} />
+                </Box>
+
+                {/* Botones */}
+                <Box
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  paddingHorizontal="m"
+                  paddingVertical="s"
+                >
+                  <Pressable onPress={cancelIOS}>
+                    <Text color="textSecondary" style={{ fontSize: 16 }}>Cancelar</Text>
+                  </Pressable>
+                  <Pressable onPress={confirmIOS}>
+                    <Text color="primary" style={{ fontSize: 16, fontWeight: '600' }}>Listo</Text>
+                  </Pressable>
+                </Box>
+
+                <DateTimePicker
+                  value={iosDraft ?? currentDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={handleIOSChange}
+                  style={{ height: 216 }}
+                />
+                <Box style={{ height: 32 }} />
+              </Box>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )}
     </>
   );
 }
@@ -380,31 +529,12 @@ export function FilterBottomSheet({
                   />
                 </Box>
               ) : field.type === 'date' ? (
-                // Date field — plain text input with ISO date format (YYYY-MM-DD).
-                // @react-native-community/datetimepicker not installed; using text fallback.
-                <Box
-                  borderWidth={1}
-                  borderColor="border"
-                  borderRadius="m"
-                  backgroundColor="surface"
-                  paddingHorizontal="m"
-                  style={{ height: 44 }}
-                >
-                  <TextInput
-                    value={localValues[field.key] ?? ''}
-                    onChangeText={text => handleFieldChange(field.key, text)}
-                    placeholder={field.placeholder ?? 'YYYY-MM-DD'}
-                    placeholderTextColor={theme.colors.textSecondary}
-                    style={{
-                      flex: 1,
-                      height: '100%',
-                      color: theme.colors.text,
-                      fontSize: 14,
-                    }}
-                    keyboardType="default"
-                    maxLength={10}
-                  />
-                </Box>
+                <DatePickerInput
+                  value={localValues[field.key]}
+                  placeholder={field.placeholder ?? 'Seleccionar fecha…'}
+                  onChange={val => handleFieldChange(field.key, val)}
+                  theme={theme}
+                />
               ) : (
                 <Box
                   borderWidth={1}

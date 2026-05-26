@@ -81,7 +81,7 @@ android {
     namespace "com.intermotors_mobile"
     splits {
         abi {
-            enable true
+            enable gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
             reset()
             include "arm64-v8a", "armeabi-v7a"
             universalApk false

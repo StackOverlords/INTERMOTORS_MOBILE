@@ -1,3 +1,34 @@
+import type { FilterFieldConfig } from '@/shared/types/filter.types';
+
+// ---------------------------------------------------------------------------
+// SalesFilters — flat map of query params for the sales list
+// Numeric IDs are kept as strings here — coerced to number in service layer
+// ---------------------------------------------------------------------------
+export type SalesFilters = Partial<{
+  codigo_interno: string;         // numeric as string — coerced to number in service
+  cliente: string;                // numeric ID as string — coerced to number in service
+  keywords: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  codigo_oem_producto: string;
+}>;
+
+// ---------------------------------------------------------------------------
+// DEFAULT_SALES_FILTERS — config-driven filter fields for the sales list.
+// 3 always-visible + 3 toggleable fields.
+// ---------------------------------------------------------------------------
+export const DEFAULT_SALES_FILTERS: FilterFieldConfig[] = [
+  // --- Always-visible fields ---
+  { key: 'codigo_interno',      label: 'Nro. Venta',   type: 'number', enabled: true,  toggleable: false, placeholder: 'Número de venta...' },
+  { key: 'cliente',             label: 'Cliente (ID)', type: 'number', enabled: true,  toggleable: false, placeholder: 'ID del cliente...' },
+  { key: 'keywords',            label: 'Buscar',       type: 'text',   enabled: true,  toggleable: false, placeholder: 'Comentarios, comprobante...' },
+
+  // --- Optional/toggleable fields ---
+  { key: 'fecha_inicio',        label: 'Desde',        type: 'date',   enabled: false, toggleable: true,  placeholder: 'YYYY-MM-DD' },
+  { key: 'fecha_fin',           label: 'Hasta',        type: 'date',   enabled: false, toggleable: true,  placeholder: 'YYYY-MM-DD' },
+  { key: 'codigo_oem_producto', label: 'Código OEM',   type: 'text',   enabled: false, toggleable: true,  placeholder: 'Código OEM del producto...' },
+];
+
 // ---------------------------------------------------------------------------
 // SaleCustomer — mirrors desktop SaleCustomerGetSchema fields used in list
 // ---------------------------------------------------------------------------
