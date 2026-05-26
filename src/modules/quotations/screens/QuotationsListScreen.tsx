@@ -22,7 +22,7 @@ export function QuotationsListScreen(): React.JSX.Element {
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(item) => String(item.id)}
-      renderItem={(item) => <QuotationCard quotation={item} onPress={() => navigation.navigate('QuotationDetail', { id: item.id })} />}
+      renderItem={(item) => <QuotationCard quotation={item} onPress={() => navigation.navigate('QuotationDetail', { id: item.id, nro: item.nro_cotizacion })} />}
       emptyTitle="Sin cotizaciones"
       emptyMessage="No hay cotizaciones disponibles."
       onEndReached={() => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); }}

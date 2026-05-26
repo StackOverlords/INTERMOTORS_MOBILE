@@ -30,14 +30,11 @@ export type DrawerParamList = {
   Transfers: undefined;
   AccountsReceivable: undefined;
   Inventory: undefined;
-  Utilities: undefined;
-  SalesReport: undefined;
-  BestSellers: undefined;
   Settings: undefined;
 };
 
 // ---------------------------------------------------------------------------
-// Detail stack param lists — Stack inside Drawer for the 4 modules with getById
+// Detail stack param lists — Stack inside Drawer for modules with getById
 // ---------------------------------------------------------------------------
 export type ProductsStackParamList = {
   ProductsList: undefined;
@@ -46,17 +43,32 @@ export type ProductsStackParamList = {
 
 export type SalesStackParamList = {
   SalesList: undefined;
-  SaleDetail: { id: number };
+  SaleDetail: { id: number; nro: string };
 };
 
 export type OrdersStackParamList = {
   OrdersList: undefined;
-  OrderDetail: { id: number };
+  OrderDetail: { id: number; nro: string };
 };
 
 export type QuotationsStackParamList = {
   QuotationsList: undefined;
-  QuotationDetail: { id: number };
+  QuotationDetail: { id: number; nro: string };
+};
+
+export type PurchasesStackParamList = {
+  PurchasesList: undefined;
+  PurchaseDetail: { id: number; nro: string };
+};
+
+export type TransfersStackParamList = {
+  TransfersList: undefined;
+  TransferDetail: { id: number; nro: string };
+};
+
+export type AccountsReceivableStackParamList = {
+  AccountsReceivableList: undefined;
+  AccountReceivableDetail: { id: number; nro: string };
 };
 
 // ---------------------------------------------------------------------------

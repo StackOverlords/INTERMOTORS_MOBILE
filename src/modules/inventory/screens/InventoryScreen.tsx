@@ -3,11 +3,11 @@ import React from 'react';
 import { DeclarativeList } from '@/shared/components';
 import { useCategories } from '@/shared/hooks/useCategories';
 import type { FilterFieldConfig } from '@/shared/types/filter.types';
-import { defineListFields } from '@/shared/components/lists/defineListFields';
 
 import { useInventarioGeneral } from '../hooks/useInventarioGeneral';
 import { useInventoryFilters } from '../hooks/useInventoryFilters';
 import type { InventarioItem } from '../types/inventory.types';
+import { InventarioCard } from '../components/InventarioCard';
 
 // ---------------------------------------------------------------------------
 // Filter config
@@ -19,17 +19,6 @@ const INVENTORY_FILTER_FIELDS: FilterFieldConfig[] = [
   { key: 'incluir_transito',        label: 'Incluir tránsito',      type: 'boolean',                      enabled: false, toggleable: true  },
   { key: 'ver_solo_con_movimiento', label: 'Solo con movimiento',   type: 'boolean',                      enabled: false, toggleable: true  },
 ];
-
-// ---------------------------------------------------------------------------
-// List fields — driven by defineListFields for type safety
-// ---------------------------------------------------------------------------
-const INVENTORY_FIELDS = defineListFields<InventarioItem>([
-  { key: 'codigo',        label: 'Código',         accessor: (i) => i.codigo },
-  { key: 'producto',      label: 'Producto',        accessor: (i) => i.producto },
-  { key: 'stock',         label: 'Stock',           accessor: (i) => i.stock },
-  { key: 'valor',         label: 'Valor',           accessor: (i) => i.valor,          variant: 'currency' },
-  { key: 'costo_promedio', label: 'Costo promedio', accessor: (i) => i.costo_promedio,  variant: 'currency' },
-]);
 
 // ---------------------------------------------------------------------------
 // InventoryScreen
@@ -49,7 +38,7 @@ export function InventoryScreen(): React.JSX.Element {
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(item, index) => `${item.codigo}-${index}`}
-      fields={INVENTORY_FIELDS}
+      renderItem={(item) => <InventarioCard item={item} />}
       filterFields={INVENTORY_FILTER_FIELDS}
       filterValues={filters.activeFilters}
       onFilterChange={filters.handleChange}

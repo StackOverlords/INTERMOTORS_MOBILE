@@ -1,6 +1,6 @@
 /**
  * Parameterized currency formatter using Intl.NumberFormat.
- * No hardcoded locale or currency — caller owns those decisions.
+ * Falls back to 'BOB' if the currency code is invalid (e.g. dirty DB data).
  */
 export function formatCurrency(
   amount: number,
@@ -8,12 +8,18 @@ export function formatCurrency(
   locale: string,
   fractionDigits = 2,
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  }).format(amount);
+  // ISO 4217: exactly 3 uppercase ASCII letters
+  const safeCurrency = /^[A-Z]{3}$/.test(currency) ? currency : 'BOB';
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: safeCurrency,
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }).format(amount);
+  } catch {
+    return `${safeCurrency} ${Number(amount).toFixed(fractionDigits)}`;
+  }
 }
 
 /**

@@ -3,22 +3,16 @@ import { StyleSheet, Text as RNText, TouchableOpacity, View } from 'react-native
 import { useTheme } from '@shopify/restyle';
 
 import type { Theme } from '@/themes';
-import { formatCurrency } from '@/shared/utils/format';
-import type { Product } from '../types/product.types';
-import { getStockVariant } from './ProductCard.utils';
+import { formatCurrency, formatDate } from '@/shared/utils/format';
+import type { Transfer } from '../types/transfer.types';
 
-type ProductCardProps = {
-  product: Product;
+type TransferCardProps = {
+  transfer: Transfer;
   onPress?: () => void;
 };
 
-export function ProductCard({ product, onPress }: ProductCardProps) {
+export function TransferCard({ transfer, onPress }: TransferCardProps) {
   const { colors } = useTheme<Theme>();
-  const stockInt = Math.floor(product.stock_actual);
-  const variant = getStockVariant(stockInt);
-
-  const chipBg = colors[`${variant}Background` as keyof typeof colors] as string;
-  const chipFg = colors[variant as keyof typeof colors] as string;
 
   const c = {
     bg: colors.cardBackground as string,
@@ -26,6 +20,8 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
     text: colors.text as string,
     muted: colors.textSecondary as string,
     primary: colors.primary as string,
+    infoBg: colors.infoBackground as string,
+    info: colors.info as string,
   };
 
   return (
@@ -35,42 +31,38 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
       disabled={!onPress}
       style={[styles.card, { backgroundColor: c.bg, borderColor: c.border }]}
     >
-      {/* Row 1: código · marca  [stock] */}
+      {/* Row 1: ID · fecha  [estado] */}
       <View style={styles.row}>
         <View style={styles.leftMeta}>
-          <RNText style={[styles.id, { color: c.text }]}>#{product.codigo_interno}</RNText>
-          {product.marca ? (
-            <>
-              <RNText style={[styles.dot, { color: c.muted }]}> · </RNText>
-              <RNText style={[styles.meta, { color: c.muted }]} numberOfLines={1}>
-                {product.marca}
-              </RNText>
-            </>
-          ) : null}
-          {product.codigo_oem ? (
-            <>
-              <RNText style={[styles.dot, { color: c.muted }]}> · </RNText>
-              <RNText style={[styles.meta, { color: c.muted }]}>OEM </RNText>
-              <RNText style={[styles.id, { color: c.text }]} numberOfLines={1}>
-                {product.codigo_oem}
-              </RNText>
-            </>
-          ) : null}
+          <RNText style={[styles.id, { color: c.text }]}>{transfer.nro_transferencia}</RNText>
+          <RNText style={[styles.dot, { color: c.muted }]}> · </RNText>
+          <RNText style={[styles.meta, { color: c.muted }]}>
+            {formatDate(transfer.fecha, 'es-BO')}
+          </RNText>
         </View>
-        <View style={[styles.chip, { backgroundColor: chipBg, borderColor: chipFg }]}>
-          <RNText style={[styles.chipText, { color: chipFg }]}>{stockInt} u.</RNText>
+        <View style={[styles.chip, { backgroundColor: c.infoBg, borderColor: c.info }]}>
+          <RNText style={[styles.chipText, { color: c.info }]} numberOfLines={1}>
+            {transfer.estado}
+          </RNText>
         </View>
       </View>
 
-      {/* Row 2: descripción + precio */}
+      {/* Row 2: origen → destino + total */}
       <View style={[styles.row, styles.mainRow]}>
         <RNText style={[styles.name, { color: c.text }]} numberOfLines={1}>
-          {product.descripcion}
+          {transfer.origen?.sigla ?? '—'} → {transfer.destino?.sigla ?? '—'}
         </RNText>
         <RNText style={[styles.amount, { color: c.primary }]}>
-          {formatCurrency(product.precio_venta, 'BOB', 'es-BO')}
+          {formatCurrency(Number(transfer.total), 'BOB', 'es-BO')}
         </RNText>
       </View>
+
+      {/* Row 3: responsable (opcional) */}
+      {transfer.responsable ? (
+        <RNText style={[styles.micro, { color: c.muted }]} numberOfLines={1}>
+          {transfer.responsable.nombre}
+        </RNText>
+      ) : null}
     </TouchableOpacity>
   );
 }
@@ -119,11 +111,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     flexShrink: 0,
   },
+  micro: {
+    fontSize: 10,
+    marginTop: 3,
+  },
   chip: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
     borderWidth: 0.5,
+    maxWidth: 120,
     marginLeft: 8,
     flexShrink: 0,
   },

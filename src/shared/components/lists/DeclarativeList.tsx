@@ -89,18 +89,37 @@ export function DeclarativeList<T>(props: DeclarativeListProps<T>) {
     loadingMessage = 'Cargando…',
   } = props;
 
-  if (isLoading && data.length === 0) {
-    return <LoadingState message={loadingMessage} />;
-  }
-
-  if (error) {
-    return <ErrorState title="Error" message={error.message} />;
-  }
-
   const hasFilters = !!filterFields;
   const hasActive =
     filterValues != null &&
     Object.values(filterValues).some(v => v !== undefined && v !== '');
+
+  if (isLoading && data.length === 0 && !error) {
+    return (
+      <Box flex={1} backgroundColor="background">
+        {hasFilters && <Toolbar count={0} onOpenSheet={openSheet} />}
+        {hasFilters && hasActive && filterFields && filterValues && (
+          <GenericFilterChips
+            fields={filterFields}
+            values={filterValues}
+            resolveLabel={resolveLabel}
+            onRemove={key => onFilterChange?.({ ...filterValues, [key]: undefined })}
+          />
+        )}
+        <LoadingState message={loadingMessage} />
+        {hasFilters && filterFields && filterValues && (
+          <FilterBottomSheet
+            bottomSheetRef={sheetRef as React.RefObject<BottomSheetModal>}
+            fields={filterFields}
+            values={filterValues}
+            optionsMap={filterOptionalMap}
+            onChange={v => onFilterChange?.(v)}
+            onClear={() => onResetFilters?.()}
+          />
+        )}
+      </Box>
+    );
+  }
 
   return (
     <Box flex={1} backgroundColor="background">
@@ -115,25 +134,29 @@ export function DeclarativeList<T>(props: DeclarativeListProps<T>) {
         />
       )}
 
-      <FlatList
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={({ item }) => {
-          const { fields, renderItem: customRenderItem } = props;
-          if (fields) return <DataCard item={item} fields={fields} />;
-          return <>{customRenderItem!(item)}</>;
-        }}
-        onEndReached={onEndReached}
-        onRefresh={onRefresh}
-        refreshing={isRefreshing}
-        ListEmptyComponent={<EmptyState title={emptyTitle} message={emptyMessage} />}
-        ListFooterComponent={
-          isLoading && data.length > 0
-            ? <Spinner size="small" paddingVertical={16} />
-            : null
-        }
-        contentContainerStyle={data.length === 0 ? { flex: 1 } : { paddingVertical: 8 }}
-      />
+      {error ? (
+        <ErrorState title="Error" message={error.message} onRetry={onRefresh} />
+      ) : (
+        <FlatList
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={({ item }) => {
+            const { fields, renderItem: customRenderItem } = props;
+            if (fields) return <DataCard item={item} fields={fields} />;
+            return <>{customRenderItem!(item)}</>;
+          }}
+          onEndReached={onEndReached}
+          onRefresh={onRefresh}
+          refreshing={isRefreshing}
+          ListEmptyComponent={<EmptyState title={emptyTitle} message={emptyMessage} />}
+          ListFooterComponent={
+            isLoading && data.length > 0
+              ? <Spinner size="small" paddingVertical={16} />
+              : null
+          }
+          contentContainerStyle={data.length === 0 ? { flex: 1 } : { paddingVertical: 8 }}
+        />
+      )}
 
       {hasFilters && filterFields && filterValues && (
         <FilterBottomSheet

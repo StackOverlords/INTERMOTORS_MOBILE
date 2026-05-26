@@ -1,6 +1,20 @@
 import type { FilterFieldConfig, SelectOption } from '@/shared/types/filter.types';
 
 // ---------------------------------------------------------------------------
+// AccountReceivablePayment — single payment record from
+// GET /accounts-receivable/actions/payments/{id_venta}
+// ---------------------------------------------------------------------------
+export interface AccountReceivablePayment {
+  id: number;
+  nro_pago: string;
+  fecha: string;
+  monto: number;
+  moneda: string;
+  tipo_pago: string;
+  comentarios: string | null;
+}
+
+// ---------------------------------------------------------------------------
 // AccountReceivableCustomer — mirrors backend customer shape
 // ---------------------------------------------------------------------------
 export interface AccountReceivableCustomer {

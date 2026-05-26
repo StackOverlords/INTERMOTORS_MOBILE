@@ -1,6 +1,6 @@
 import httpClient from '@/services/http';
 
-import type { PurchaseListResponse } from '../types/purchase.types';
+import type { PurchaseDetail, PurchaseListResponse } from '../types/purchase.types';
 
 const PAGE_SIZE = 20;
 
@@ -13,5 +13,10 @@ export const purchasesService = {
       params: { sucursal, pagina: page, pagina_registros: pageSize },
     });
     return response.data;
+  },
+
+  async getPurchaseById(id: number): Promise<PurchaseDetail> {
+    const response = await httpClient.get<{ data: PurchaseDetail }>(`/purchases/${id}`);
+    return response.data.data;
   },
 };

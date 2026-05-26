@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { DeclarativeList } from '@/shared/components';
 import { useListFilters } from '@/shared/hooks/useListFilters';
-import type { DrawerScreenPropsHelper } from '@/navigation';
+import type { AccountsReceivableStackParamList } from '@/navigation/types';
 
 import { AccountReceivableCard } from '../components';
 import { useAccountReceivable } from '../hooks/useAccountReceivable';
@@ -15,12 +17,9 @@ import type { AccountReceivable, AccountReceivableFilters } from '../types/accou
 
 // ---------------------------------------------------------------------------
 // AccountsReceivableScreen
-// Paginated, filterable list of accounts receivable.
-// Connects to GET /account-receivable via useAccountReceivable.
 // ---------------------------------------------------------------------------
-export function AccountsReceivableScreen(
-  _props: DrawerScreenPropsHelper<'AccountsReceivable'>,
-): React.JSX.Element {
+export function AccountsReceivableScreen(): React.JSX.Element {
+  const navigation = useNavigation<NativeStackNavigationProp<AccountsReceivableStackParamList>>();
   const filters = useListFilters<AccountReceivableFilters>();
 
   const {
@@ -44,7 +43,15 @@ export function AccountsReceivableScreen(
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(item) => String(item.id)}
-      renderItem={(item) => <AccountReceivableCard item={item} />}
+      renderItem={(item) => (
+        <AccountReceivableCard
+          item={item}
+          onPress={() => navigation.navigate('AccountReceivableDetail', {
+            id: item.id,
+            nro: item.nro_venta,
+          })}
+        />
+      )}
       filterFields={DEFAULT_AR_FILTERS}
       filterValues={filters.activeFilters}
       onFilterChange={filters.handleChange}

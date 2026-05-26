@@ -1,6 +1,6 @@
 import httpClient from '@/services/http';
 
-import type { Sale, SaleListResponse } from '../types/sale.types';
+import type { SaleDetail, SaleListResponse } from '../types/sale.types';
 
 const PAGE_SIZE = 20;
 
@@ -15,8 +15,8 @@ export const salesService = {
     return response.data;
   },
 
-  async getSaleById(id: number): Promise<Sale> {
-    const response = await httpClient.get<{ data: Sale }>(`/sales/${id}`);
+  async getSaleById(id: number): Promise<SaleDetail> {
+    const response = await httpClient.get<{ data: SaleDetail }>(`/sales/${id}`);
     return response.data.data;
   },
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import { ThemeProvider as RestyleThemeProvider } from '@shopify/restyle';
 
@@ -10,9 +10,23 @@ interface AppThemeProviderProps {
   children: React.ReactNode;
 }
 
-export const AppThemeProvider = ({ children }: AppThemeProviderProps): React.JSX.Element => {
+export const AppThemeProvider = ({ children }: AppThemeProviderProps): React.JSX.Element | null => {
   const systemScheme = useColorScheme();
   const themeId = useThemeStore((s) => s.themeId);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Wait for zustand persist to rehydrate from AsyncStorage before rendering
+    const unsub = useThemeStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useThemeStore.persist.hasHydrated()) {
+      setHydrated(true);
+    }
+    return unsub;
+  }, []);
+
+  if (!hydrated) {
+    return null;
+  }
 
   const resolvedId: ThemeId =
     themeId === 'system'

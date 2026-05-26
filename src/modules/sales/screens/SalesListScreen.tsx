@@ -22,7 +22,7 @@ export function SalesListScreen() {
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(item) => String(item.id)}
-      renderItem={(item) => <SaleCard sale={item} onPress={() => navigation.navigate('SaleDetail', { id: item.id })} />}
+      renderItem={(item) => <SaleCard sale={item} onPress={() => navigation.navigate('SaleDetail', { id: item.id, nro: item.nro_venta })} />}
       emptyTitle="Sin ventas"
       emptyMessage="No hay ventas disponibles en este momento."
       onEndReached={() => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); }}

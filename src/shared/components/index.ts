@@ -9,6 +9,7 @@ export type { ButtonVariant, ButtonSize } from './Button';
 export { Divider } from './Divider';
 export { SectionHeader } from './SectionHeader';
 export { ScreenLayout } from './ScreenLayout';
+export { DetailHeader } from './DetailHeader';
 export { IconBadge } from './IconBadge';
 export { Spinner } from './Spinner';
 export * from './lists';

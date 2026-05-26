@@ -1,6 +1,6 @@
 import httpClient from '@/services/http';
 
-import type { Order, OrderListResponse } from '../types/order.types';
+import type { OrderDetail, OrderListResponse } from '../types/order.types';
 
 const PAGE_SIZE = 20;
 
@@ -16,8 +16,8 @@ export const ordersService = {
     return response.data;
   },
 
-  async getOrderById(id: number): Promise<Order> {
-    const response = await httpClient.get<{ data: Order }>(`/placeorders/${id}`);
+  async getOrderById(id: number): Promise<OrderDetail> {
+    const response = await httpClient.get<{ data: OrderDetail }>(`/placeorders/${id}`);
     return response.data.data;
   },
 };

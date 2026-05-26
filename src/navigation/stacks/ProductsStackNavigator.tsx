@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform, StatusBar } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@shopify/restyle';
 
@@ -18,6 +19,8 @@ export function ProductsStackNavigator(): React.JSX.Element {
         headerStyle: { backgroundColor: colors.surface },
         headerTintColor: colors.text,
         headerShadowVisible: false,
+        statusBarTranslucent: Platform.OS === 'android',
+        headerStatusBarHeight: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0,
       }}
     >
       <Stack.Screen
@@ -28,7 +31,7 @@ export function ProductsStackNavigator(): React.JSX.Element {
       <Stack.Screen
         name="ProductDetail"
         component={ProductDetailScreen}
-        options={{ title: 'Producto' }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

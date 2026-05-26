@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 
@@ -22,5 +22,15 @@ export function usePurchases() {
       return nextPage <= lastPage.meta.last_page ? nextPage : undefined;
     },
     enabled: sucursalId !== null,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// usePurchase — single purchase by id
+// ---------------------------------------------------------------------------
+export function usePurchase(id: number) {
+  return useQuery({
+    queryKey: ['purchases', id],
+    queryFn: () => purchasesService.getPurchaseById(id),
   });
 }

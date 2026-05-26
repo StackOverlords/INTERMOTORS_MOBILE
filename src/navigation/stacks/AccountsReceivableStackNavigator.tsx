@@ -4,13 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@shopify/restyle';
 
 import type { Theme } from '@/themes';
-import type { OrdersStackParamList } from '@/navigation/types';
-import { OrdersListScreen } from '@/modules/orders/screens/OrdersListScreen';
-import { OrderDetailScreen } from '@/modules/orders/screens/OrderDetailScreen';
+import type { AccountsReceivableStackParamList } from '@/navigation/types';
+import { AccountsReceivableScreen } from '@/modules/accounts/screens/AccountsReceivableScreen';
+import { AccountReceivableDetailScreen } from '@/modules/accounts/screens/AccountReceivableDetailScreen';
 
-const Stack = createNativeStackNavigator<OrdersStackParamList>();
+const Stack = createNativeStackNavigator<AccountsReceivableStackParamList>();
 
-export function OrdersStackNavigator(): React.JSX.Element {
+export function AccountsReceivableStackNavigator(): React.JSX.Element {
   const { colors } = useTheme<Theme>();
 
   return (
@@ -24,13 +24,13 @@ export function OrdersStackNavigator(): React.JSX.Element {
       }}
     >
       <Stack.Screen
-        name="OrdersList"
-        component={OrdersListScreen}
+        name="AccountsReceivableList"
+        component={AccountsReceivableScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="OrderDetail"
-        component={OrderDetailScreen}
+        name="AccountReceivableDetail"
+        component={AccountReceivableDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

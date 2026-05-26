@@ -22,10 +22,7 @@ import {
   LogOut,
   List,
   Archive,
-  TrendingUp,
   ShoppingBag,
-  BarChart2,
-  Star,
   ClipboardList,
   ArrowLeftRight,
   CreditCard,
@@ -49,14 +46,12 @@ import { OrdersStackNavigator } from '@/navigation/stacks/OrdersStackNavigator';
 import { QuotationsStackNavigator } from '@/navigation/stacks/QuotationsStackNavigator';
 
 // New stub screens
-import { PurchasesListScreen } from '@/modules/purchases/screens/PurchasesListScreen';
-import { TransfersListScreen } from '@/modules/transfers/screens/TransfersListScreen';
-import { AccountsReceivableScreen } from '@/modules/accounts/screens/AccountsReceivableScreen';
 import { InventoryScreen } from '@/modules/inventory/screens/InventoryScreen';
-import { UtilitiesScreen } from '@/modules/inventory/screens/UtilitiesScreen';
-import { SalesReportScreen } from '@/modules/reports/screens/SalesReportScreen';
-import { BestSellersScreen } from '@/modules/reports/screens/BestSellersScreen';
+import { AccountsReceivableStackNavigator } from '@/navigation/stacks/AccountsReceivableStackNavigator';
 import { SettingsScreen } from '@/modules/settings/screens/SettingsScreen';
+
+import { PurchasesStackNavigator } from '@/navigation/stacks/PurchasesStackNavigator';
+import { TransfersStackNavigator } from '@/navigation/stacks/TransfersStackNavigator';
 
 // ---------------------------------------------------------------------------
 // Tree sections config
@@ -69,17 +64,15 @@ const TREE_SECTIONS: TreeMenuSection[] = [
     items: [
       { label: 'Lista', routeName: 'Products', icon: List },
       { label: 'Inventario', routeName: 'Inventory', icon: Archive },
-      { label: 'Utilidades', routeName: 'Utilities', icon: TrendingUp },
     ],
   },
   {
     key: 'ventas',
     label: 'Ventas',
     icon: ShoppingBag,
+    direct: true,
     items: [
-      { label: 'Lista', routeName: 'Sales', icon: List },
-      { label: 'Reporte General', routeName: 'SalesReport', icon: BarChart2 },
-      { label: 'Más Vendidos', routeName: 'BestSellers', icon: Star },
+      { label: 'Ventas', routeName: 'Sales', icon: List },
     ],
   },
   {
@@ -339,26 +332,11 @@ export function MainNavigator(): React.JSX.Element {
         options={{ title: 'Inventario' }}
       />
       <Drawer.Screen
-        name="Utilities"
-        component={UtilitiesScreen}
-        options={{ title: 'Utilidades' }}
-      />
-      <Drawer.Screen
         name="Sales"
         component={SalesStackNavigator}
         options={({ route }) => ({
           headerShown: getFocusedRouteNameFromRoute(route) !== 'SaleDetail',
         })}
-      />
-      <Drawer.Screen
-        name="SalesReport"
-        component={SalesReportScreen}
-        options={{ title: 'Reporte General' }}
-      />
-      <Drawer.Screen
-        name="BestSellers"
-        component={BestSellersScreen}
-        options={{ title: 'Más Vendidos' }}
       />
       <Drawer.Screen
         name="Orders"
@@ -369,8 +347,10 @@ export function MainNavigator(): React.JSX.Element {
       />
       <Drawer.Screen
         name="Purchases"
-        component={PurchasesListScreen}
-        options={{ title: 'Compras' }}
+        component={PurchasesStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'PurchaseDetail',
+        })}
       />
       <Drawer.Screen
         name="Quotations"
@@ -381,13 +361,17 @@ export function MainNavigator(): React.JSX.Element {
       />
       <Drawer.Screen
         name="Transfers"
-        component={TransfersListScreen}
-        options={{ title: 'Transferencias' }}
+        component={TransfersStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'TransferDetail',
+        })}
       />
       <Drawer.Screen
         name="AccountsReceivable"
-        component={AccountsReceivableScreen}
-        options={{ title: 'Cuentas por Cobrar' }}
+        component={AccountsReceivableStackNavigator}
+        options={({ route }) => ({
+          headerShown: getFocusedRouteNameFromRoute(route) !== 'AccountReceivableDetail',
+        })}
       />
       <Drawer.Screen
         name="Settings"

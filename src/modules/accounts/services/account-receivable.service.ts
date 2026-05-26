@@ -4,6 +4,7 @@ import type {
   AccountReceivable,
   AccountReceivableFilters,
   AccountReceivableListResponse,
+  AccountReceivablePayment,
 } from '../types/account-receivable.types';
 
 // ---------------------------------------------------------------------------
@@ -54,5 +55,12 @@ export const accountReceivableService = {
       data: response.data.data,
       total: response.data.meta.total,
     };
+  },
+
+  async getPayments(idVenta: number): Promise<AccountReceivablePayment[]> {
+    const response = await httpClient.get<{ data: AccountReceivablePayment[] }>(
+      `/accounts-receivable/actions/payments/${idVenta}`,
+    );
+    return response.data.data;
   },
 };

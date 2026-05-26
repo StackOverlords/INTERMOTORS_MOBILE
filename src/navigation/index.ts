@@ -7,6 +7,8 @@ export type {
   SalesStackParamList,
   OrdersStackParamList,
   QuotationsStackParamList,
+  PurchasesStackParamList,
+  TransfersStackParamList,
   RootStackScreenProps,
   AuthStackScreenProps,
   DrawerScreenPropsHelper,

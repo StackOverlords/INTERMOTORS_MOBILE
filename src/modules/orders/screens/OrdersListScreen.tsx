@@ -22,7 +22,7 @@ export function OrdersListScreen() {
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(item) => String(item.id)}
-      renderItem={(item) => <OrderCard order={item} onPress={() => navigation.navigate('OrderDetail', { id: item.id })} />}
+      renderItem={(item) => <OrderCard order={item} onPress={() => navigation.navigate('OrderDetail', { id: item.id, nro: item.nro_pedido })} />}
       emptyTitle="Sin pedidos"
       emptyMessage="No se encontraron pedidos registrados."
       onEndReached={() => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); }}

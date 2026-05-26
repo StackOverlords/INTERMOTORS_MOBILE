@@ -1,6 +1,6 @@
 import httpClient from '@/services/http';
 
-import type { Quotation, QuotationListResponse } from '../types/quotation.types';
+import type { QuotationDetail, QuotationListResponse } from '../types/quotation.types';
 
 const PAGE_SIZE = 20;
 
@@ -15,8 +15,8 @@ export const quotationsService = {
     return response.data;
   },
 
-  async getQuotationById(id: number): Promise<Quotation> {
-    const response = await httpClient.get<{ data: Quotation }>(`/quotations/${id}`);
+  async getQuotationById(id: number): Promise<QuotationDetail> {
+    const response = await httpClient.get<{ data: QuotationDetail }>(`/quotations/${id}`);
     return response.data.data;
   },
 };

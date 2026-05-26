@@ -1,87 +1,109 @@
 import React from 'react';
+import { StyleSheet, Text as RNText, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@shopify/restyle';
 
-import { Badge, Card } from '@/shared/components';
-import { Box, Text } from '@/themes';
+import type { Theme } from '@/themes';
 import { formatCurrency, formatDate } from '@/shared/utils/format';
-
 import type { AccountReceivable } from '../types/account-receivable.types';
 
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
 type AccountReceivableCardProps = {
   item: AccountReceivable;
+  onPress?: () => void;
 };
 
-// ---------------------------------------------------------------------------
-// AccountReceivableCard
-// - saldo > 0 → danger color (red) + "DEUDA" badge
-// - saldo === 0 → success color (green) + "PAGADO" badge
-// - responsable section is omitted when null (no crash)
-// ---------------------------------------------------------------------------
-export function AccountReceivableCard({ item }: AccountReceivableCardProps) {
+export function AccountReceivableCard({ item, onPress }: AccountReceivableCardProps) {
+  const { colors } = useTheme<Theme>();
+
   const hasDebt = item.saldo > 0;
-  const saldoColor = hasDebt ? 'danger' : 'success';
-  const statusBadgeVariant = hasDebt ? 'danger' : 'success';
-  const statusLabel = hasDebt ? 'DEUDA' : 'PAGADO';
+  const chipBg = (hasDebt ? colors.dangerBackground : colors.successBackground) as string;
+  const chipFg = (hasDebt ? colors.danger : colors.success) as string;
+  const saldoColor = (hasDebt ? colors.danger : colors.success) as string;
+
+  const c = {
+    bg: colors.cardBackground as string,
+    border: colors.border as string,
+    text: colors.text as string,
+    muted: colors.textSecondary as string,
+    primary: colors.primary as string,
+  };
 
   return (
-    <Card marginBottom="s">
-      {/* Numero de venta + status badge */}
-      <Box flexDirection="row" justifyContent="space-between" alignItems="center" marginBottom="xs">
-        <Text variant="subheader" numberOfLines={1} style={{ flex: 1, marginRight: 8 }}>
-          Nro. {item.nro_venta}
-        </Text>
-        <Badge label={statusLabel} variant={statusBadgeVariant} />
-      </Box>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      disabled={!onPress}
+      style={[styles.card, { backgroundColor: c.bg, borderColor: c.border }]}
+    >
+      {/* Row 1: nro_venta · fecha  [badge] */}
+      <View style={styles.row}>
+        <View style={styles.leftMeta}>
+          <RNText style={[styles.id, { color: c.text }]}>{item.nro_venta}</RNText>
+          <RNText style={[styles.dot, { color: c.muted }]}> · </RNText>
+          <RNText style={[styles.meta, { color: c.muted }]}>
+            {formatDate(item.fecha, 'es-BO')}
+          </RNText>
+        </View>
+        <View style={[styles.chip, { backgroundColor: chipBg, borderColor: chipFg }]}>
+          <RNText style={[styles.chipText, { color: chipFg }]}>
+            {hasDebt ? 'DEUDA' : 'PAGADO'}
+          </RNText>
+        </View>
+      </View>
 
-      {/* Cliente */}
-      <Text variant="body" color="text" marginBottom="xs">
-        {item.cliente.cliente}
-      </Text>
+      {/* Row 2: cliente + saldo */}
+      <View style={[styles.row, styles.mainRow]}>
+        <RNText style={[styles.name, { color: c.text }]} numberOfLines={1}>
+          {item.cliente.cliente}
+        </RNText>
+        <RNText style={[styles.amount, { color: saldoColor }]}>
+          {formatCurrency(item.saldo, 'BOB', 'es-BO')}
+        </RNText>
+      </View>
 
-      {/* Fecha + Plazo de pago */}
-      <Box flexDirection="row" gap="s" marginBottom="s">
-        <Badge label={formatDate(item.fecha, 'es-AR')} variant="default" />
-        <Badge label={item.plazo_pago} variant="info" />
-      </Box>
-
-      {/* Financial summary row */}
-      <Box flexDirection="row" justifyContent="space-between" marginBottom="xs">
-        <Box alignItems="flex-start">
-          <Text variant="caption" color="textSecondary">
-            Vendido
-          </Text>
-          <Text variant="body" color="text">
-            {formatCurrency(item.total_vendido, 'BOB', 'es-BO')}
-          </Text>
-        </Box>
-        <Box alignItems="center">
-          <Text variant="caption" color="textSecondary">
-            Pagado
-          </Text>
-          <Text variant="body" color="text">
-            {formatCurrency(item.total_pagado, 'BOB', 'es-BO')}
-          </Text>
-        </Box>
-        <Box alignItems="flex-end">
-          <Text variant="caption" color="textSecondary">
-            Saldo
-          </Text>
-          {/* saldo color: danger (red) when > 0, success (green) when = 0 */}
-          <Text variant="body" color={saldoColor} style={{ fontWeight: '700' }}>
-            {formatCurrency(item.saldo, 'BOB', 'es-BO')}
-          </Text>
-        </Box>
-      </Box>
-
-      {/* Responsable — only rendered when not null */}
+      {/* Row 3: responsable (opcional) */}
       {item.responsable ? (
-        <Text variant="caption" color="textSecondary">
-          {item.responsable.nombre}
-          {item.responsable.apellido_paterno ? ` ${item.responsable.apellido_paterno}` : ''}
-        </Text>
+        <RNText style={[styles.micro, { color: c.muted }]} numberOfLines={1}>
+          {[item.responsable.nombre, item.responsable.apellido_paterno].filter(Boolean).join(' ')}
+        </RNText>
       ) : null}
-    </Card>
+    </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 10,
+    borderWidth: 0.5,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginHorizontal: 16,
+    marginBottom: 6,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  mainRow: { marginTop: 5 },
+  leftMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  },
+  id: { fontSize: 12, fontWeight: '600', letterSpacing: 0.2 },
+  dot: { fontSize: 11 },
+  meta: { fontSize: 11 },
+  name: { fontSize: 13, fontWeight: '600', flex: 1, marginRight: 8 },
+  amount: { fontSize: 14, fontWeight: '700', flexShrink: 0 },
+  micro: { fontSize: 10, marginTop: 3 },
+  chip: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    maxWidth: 80,
+    marginLeft: 8,
+    flexShrink: 0,
+  },
+  chipText: { fontSize: 10, fontWeight: '600' },
+});

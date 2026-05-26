@@ -37,7 +37,7 @@ export function ProductsListScreen() {
       isLoading={isLoading}
       error={isError ? error : null}
       keyExtractor={(p) => String(p.id)}
-      renderItem={(p) => <ProductCard product={p} onDetailPress={() => navigation.navigate('ProductDetail', { id: p.id })} />}
+      renderItem={(p) => <ProductCard product={p} onPress={() => navigation.navigate('ProductDetail', { id: p.id })} />}
       filterFields={DEFAULT_PRODUCT_FILTERS}
       filterValues={filters.activeFilters}
       onFilterChange={filters.handleChange}

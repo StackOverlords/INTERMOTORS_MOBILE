@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 
@@ -25,5 +25,15 @@ export function useAccountReceivable(filters: AccountReceivableFilters = {}) {
       return loadedCount < lastPage.total ? allPages.length + 1 : undefined;
     },
     enabled: sucursalId !== null,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// useAccountReceivablePayments — payment history for a single sale.
+// ---------------------------------------------------------------------------
+export function useAccountReceivablePayments(idVenta: number) {
+  return useQuery({
+    queryKey: ['account-receivable-payments', idVenta],
+    queryFn: () => accountReceivableService.getPayments(idVenta),
   });
 }

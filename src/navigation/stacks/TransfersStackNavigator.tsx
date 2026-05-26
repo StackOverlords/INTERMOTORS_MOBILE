@@ -4,13 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '@shopify/restyle';
 
 import type { Theme } from '@/themes';
-import type { OrdersStackParamList } from '@/navigation/types';
-import { OrdersListScreen } from '@/modules/orders/screens/OrdersListScreen';
-import { OrderDetailScreen } from '@/modules/orders/screens/OrderDetailScreen';
+import type { TransfersStackParamList } from '@/navigation/types';
+import { TransfersListScreen } from '@/modules/transfers/screens/TransfersListScreen';
+import { TransferDetailScreen } from '@/modules/transfers/screens/TransferDetailScreen';
 
-const Stack = createNativeStackNavigator<OrdersStackParamList>();
+const Stack = createNativeStackNavigator<TransfersStackParamList>();
 
-export function OrdersStackNavigator(): React.JSX.Element {
+export function TransfersStackNavigator(): React.JSX.Element {
   const { colors } = useTheme<Theme>();
 
   return (
@@ -24,13 +24,13 @@ export function OrdersStackNavigator(): React.JSX.Element {
       }}
     >
       <Stack.Screen
-        name="OrdersList"
-        component={OrdersListScreen}
+        name="TransfersList"
+        component={TransfersListScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="OrderDetail"
-        component={OrderDetailScreen}
+        name="TransferDetail"
+        component={TransferDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -57,3 +57,39 @@ export interface ProductListResponse {
   data: Product[];
   meta: ProductListMeta;
 }
+
+// ---------------------------------------------------------------------------
+// ProductDetail — shape returned by GET /products/:id (objects, string prices)
+// ---------------------------------------------------------------------------
+interface ProductCategoriaObj  { id: number; categoria: string }
+interface ProductSubcategoriaObj { id: number; subcategoria: string }
+interface ProductMarcaObj      { id: number; marca: string }
+interface ProductProcedenciaObj { id: number; procedencia: string }
+interface ProductUnidadMedidaObj { id: number; unidad_medida: string }
+interface ProductMarcaVehiculoObj { id: number; marca_vehiculo: string }
+
+export interface ProductDetail {
+  id: number;
+  codigo_interno: number;
+  descripcion: string;
+  descripcion_alt: string | null;
+  codigo_oem: string | null;
+  codigo_upc: string | null;
+  modelo: string | null;
+  medida: string | null;
+  nro_motor: string | null;
+  categoria: ProductCategoriaObj | null;
+  subcategoria: ProductSubcategoriaObj | null;
+  marca: ProductMarcaObj | null;
+  procedencia: ProductProcedenciaObj | null;
+  unidad_medida: ProductUnidadMedidaObj | null;
+  marca_vehiculo: ProductMarcaVehiculoObj | null;
+  costo_referencia: string | null;
+  stock_minimo: string | null;
+  stock_actual: string;
+  precio_venta: string;
+  precio_venta_alt: string;
+  imagen: string | null;
+  imagen_name: string | null;
+  imagen_ext: string | null;
+}
