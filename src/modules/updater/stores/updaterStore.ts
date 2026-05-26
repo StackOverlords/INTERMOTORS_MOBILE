@@ -13,11 +13,13 @@ interface UpdaterStore {
   release: ReleaseInfo | null;
   progress: number;
   shouldPresent: boolean;
+  errorMessage: string | null;
 
   checkForUpdate: () => Promise<void>;
   downloadAndInstall: () => Promise<void>;
   dismiss: () => void;
   requestPresent: () => void;
+  resetToAvailable: () => void;
 }
 
 export const useUpdaterStore = create<UpdaterStore>((set, get) => ({
@@ -25,6 +27,7 @@ export const useUpdaterStore = create<UpdaterStore>((set, get) => ({
   release: null,
   progress: 0,
   shouldPresent: false,
+  errorMessage: null,
 
   checkForUpdate: async () => {
     if (get().status !== 'idle') return;
@@ -46,27 +49,34 @@ export const useUpdaterStore = create<UpdaterStore>((set, get) => ({
     const { release } = get();
     if (!release) return;
 
-    set({ status: 'downloading', progress: 0 });
+    set({ status: 'downloading', progress: 0, errorMessage: null });
     try {
       const { promise } = RNFS.downloadFile({
         fromUrl: release.apkUrl,
         toFile: APK_DEST,
         progressInterval: 300,
         progress: ({ bytesWritten, contentLength }) => {
-          set({ progress: bytesWritten / contentLength });
+          if (contentLength > 0) set({ progress: bytesWritten / contentLength });
         },
       });
 
-      await promise;
+      const result = await promise;
+      if (result.statusCode !== 200) {
+        throw new Error(`Descarga falló (HTTP ${result.statusCode})`);
+      }
+
       set({ status: 'ready_to_install' });
-      await FileViewer.open(APK_DEST, { showOpenWithDialog: false });
+      await FileViewer.open(APK_DEST, { showOpenWithDialog: true });
     } catch (e) {
-      console.warn('[Updater] download failed:', e);
-      set({ status: 'error' });
+      const msg = e instanceof Error ? e.message : 'Error desconocido';
+      console.warn('[Updater] install failed:', msg);
+      set({ status: 'error', errorMessage: msg });
     }
   },
 
   dismiss: () => set({ shouldPresent: false }),
 
   requestPresent: () => set({ shouldPresent: true }),
+
+  resetToAvailable: () => set({ status: 'available', errorMessage: null, progress: 0 }),
 }));
